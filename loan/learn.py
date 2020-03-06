@@ -8,13 +8,15 @@ from xgboost import XGBClassifier,XGBRFClassifier
 from sklearn.metrics import balanced_accuracy_score,roc_auc_score,roc_curve,auc
 from imblearn.ensemble import EasyEnsembleClassifier
 from sklearn.tree import DecisionTreeClassifier, export_graphviz
-import pydot
+# import pydot
 from sklearn.model_selection import cross_val_score
 from sklearn.cluster import AffinityPropagation, KMeans, MeanShift
 import numpy as np
 from plot_figures import plotPredict
 
 useful_columns = ['int_rate','installment','emp_length','annual_inc','dti','delinq_2yrs','open_acc','revol_bal','total_pymnt','profit_or_loss','loan_status']
+
+change_columns = ['Condition','Capacity','Capital','Character','Collateral','loan_status']
 
 loan_status_dict_1 = {'Fully Paid':1, 'Current':2, 'Charged Off':3, 'Late (31-120 days)':4, 'In Grace Period':5, 'Late (16-30 days)':6, 'Default':0}
 loan_status_dict_2 = {'Fully Paid':1, 'Current':1, 'Charged Off':-1, 'Late (31-120 days)':-1, 'In Grace Period':-1, 'Late (16-30 days)':-1, 'Default':-1}
@@ -46,14 +48,17 @@ def preprocess(data):
     return index_ori,unindex_ori,index,unindex,x,y,z,x_train,x_test,y_train,y_test
 
 def preprocessing_cluster(data):
-    data = data[useful_columns]
+    data=data[change_columns]
+    # data = data[useful_columns]
     index = data[data['loan_status'] != 'Default']
     unindex = data[data['loan_status'] == 'Default']
     index['loan_status'] = index['loan_status'].map(loan_status_dict_2)
     positive = index[index['loan_status'] == 1]
     negative = index[index['loan_status'] == -1]
-    x,y = np.array(positive[useful_columns[:-1]]), np.array(negative[useful_columns[:-1]])
-    zz = np.array(unindex[useful_columns[:-1]])
+    # x,y = np.array(positive[useful_columns[:-1]]), np.array(negative[useful_columns[:-1]])
+    # zz = np.array(unindex[useful_columns[:-1]])
+    x,y = np.array(positive[change_columns[:-1]]), np.array(negative[change_columns[:-1]])
+    zz = np.array(unindex[change_columns[:-1]])
     x, y, zz = scale(x), scale(y), scale(zz)
     #
     # if type == 1:
@@ -75,14 +80,18 @@ def preprocessing_cluster(data):
 def preprocessing_im(data):
     index_ori = data[data['loan_status'] != 'Default']
     unindex_ori = data[data['loan_status'] == 'Default']
-    index = index_ori[useful_columns]
-    unindex = unindex_ori[useful_columns]
+    # index = index_ori[useful_columns]
+    # unindex = unindex_ori[useful_columns]
+    index = index_ori[change_columns]
+    unindex = unindex_ori[change_columns]
     index['loan_status'] = index['loan_status'].map(loan_status_dict_2)
-    x = np.array(index[useful_columns[:-1]])
+    # x = np.array(index[useful_columns[:-1]])
+    x = np.array(index[change_columns[:-1]])
     y = np.array(index['loan_status'])
     # divide the dataset into train_set and test_set
     # to predict the rows (loan_status is 'Default')
-    z = np.array(unindex[useful_columns[:-1]])  # 未标签数据
+    # z = np.array(unindex[useful_columns[:-1]])  # 未标签数据
+    z = np.array(unindex[change_columns[:-1]])
     x, z = scale(x), scale(z)
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=33)
     return x_train,x_test,y_train,y_test,z
@@ -130,6 +139,7 @@ def learn_model(x_train,x_test,y_train,y_test,x,y,z):
     print('LogisticRegression', cross_10_pre, np.mean(cross_10_pre), np.std(cross_10_pre, ddof=1))
     # print('LogisticRegression',LR.score(x_test, y_test))
     print('LogisticRegression',z_pred_LR)
+    print('LogisticRegression',LR.get_params())
 
     # XGB = XGBClassifier()
     # XGB.fit(x_train, y_train)
@@ -151,7 +161,7 @@ def learn_model(x_train,x_test,y_train,y_test,x,y,z):
     # print('XGBRFClassifier',XGBF.score(x_test,y_test))
     print('XGBRFClassifier',z_pred_XGBF)
 
-    MLP = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(11, 2), random_state=1)
+    MLP = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
     MLP.fit(x_train,y_train)
     z_pred_MLP = MLP.predict(z)
     y_pred_MLP = MLP.predict(x_test)
@@ -162,7 +172,7 @@ def learn_model(x_train,x_test,y_train,y_test,x,y,z):
     # print('MLPClassifier2',MLP.score(x_test,y_test))
     print('MLPClassifier2',z_pred_MLP)
 
-    MLP = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(11), random_state=1)
+    MLP = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5), random_state=1)
     MLP.fit(x_train, y_train)
     z_pred_MLP = MLP.predict(z)
     y_pred_MLP = MLP.predict(x_test)

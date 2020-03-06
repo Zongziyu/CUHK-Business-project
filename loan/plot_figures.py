@@ -23,7 +23,7 @@ def plotHeatmap(dataset):
     sns.heatmap(dataset.corr(), linewidths=0.1, vmax=1.0, square=True, linecolor='white', annot=True, fmt='.2f')
     plt.xticks(rotation=-90)  # 将字体进行旋转
     plt.subplots_adjust(right=1.0,left=0.17)
-    plt.savefig('./imgs/heatmap.png')
+    # plt.savefig('./imgs/heatmap.png')
     plt.show()
 
 def plotScatter(data,plot_col):
@@ -91,3 +91,27 @@ def plotPredict(z_pred_LR, z_pred_XGBF, z_pred_MLP, z_pred_EEC):
     plt.show()
     plt.savefig('./imgs/predict.png')
     pass
+
+
+def plot5c(data,col):
+    matplotlib.style.use('ggplot')
+
+    for i in col[:-4]:
+        # for j in col[:-2]:
+        #     if i==j:
+        #         continue;
+        sns.violinplot(x='addr_state',y=i,data=data,hue='loan_status',inner=None,palette='pastel')
+        plt.subplots_adjust(left=0.07, right=0.77, top=0.88, bottom=0.30)
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0, markerscale=1.5, fontsize='large')
+        plt.show()
+
+    # sns.violinplot(x='home_ownership', y='profit_or_loss', data=data, hue='loan_status', inner=None, palette='pastel')
+    # plt.subplots_adjust(left=0.07, right=0.77, top=0.88, bottom=0.30)
+    # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0, markerscale=1.5, fontsize='large')
+    # plt.show()
+
+    # g = sns.PairGrid(data, x_vars=col[:-3], y_vars='profit_or_loss', height=4, hue='loan_status')
+    # g.map(sns.scatterplot, palette='pastel')
+    # plt.subplots_adjust(left=0.07, right=0.77, top=0.88, bottom=0.30)
+    # plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0, markerscale=1.5, fontsize='large')
+    plt.show()

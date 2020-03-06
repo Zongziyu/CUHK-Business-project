@@ -19,11 +19,16 @@ str_columns = ['home_ownership','loan_status','purpose','addr_state','earliest_c
 classification_columns = ['term','id','delinq_2yrs','emp_length']
 del_col = ['profit_or_loss','total_rec_prncp','total_rec_int','loan_amnt','total_pymnt']
 
+
 if __name__ == '__main__':
     filepath = 'loan.csv'
     init_set()
     data=data_load_proc(filepath)
-    plot_columns = data.columns - classification_columns - del_col - str_columns
+    # need_to_del_col = classification_columns + del_col + str_columns
+    # plot_columns = data.columns - classification_columns - del_col - str_columns
+    # plot_columns = data.columns.remove[classification_columns].remove[del_col].remove[str_columns]
+    plot_columns = data.columns.difference(classification_columns + del_col + str_columns)
+    print(plot_columns)
     # plotBar(data)
     # plotHeatmap(data)
     # plotScatter(data,plot_columns)
@@ -39,12 +44,13 @@ if __name__ == '__main__':
 
     y_pred_LR, y_pred_XGBF, y_pred_MLP, z_pred_LR, z_pred_XGBF, z_pred_MLP = learn_model(x_train,x_test,y_train,y_test,x,y,z)
 
-    print("--------------------------------------------------------------------")
-    _, _, _, _, _, _ = learn_model(xx_train, xx_test, yy_train, yy_test, xx, yy, zz)
+    # print("--------------------------------------------------------------------")
+    # _, _, _, _, _, _ = learn_model(xx_train, xx_test, yy_train, yy_test, xx, yy, zz)
+    #
+    #
+    # fpr, tpr, roc_auc, model_pre = ROC(y_pred_LR, y_pred_XGBF, y_pred_MLP, y_test)
+    # x_train, x_test, y_train, y_test, z = preprocessing_im(data)
 
-
-    fpr, tpr, roc_auc, model_pre = ROC(y_pred_LR, y_pred_XGBF, y_pred_MLP, y_test)
-    x_train, x_test, y_train, y_test, z = preprocessing_im(data)
     # z_pred_EEC = learn_imbalance(x_train,x_test,y_train,y_test,z)
     # plotPredict(z_pred_LR, z_pred_XGBF, z_pred_MLP, z_pred_EEC)
     # plotROC(fpr, tpr, roc_auc, model_pre)
