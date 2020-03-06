@@ -34,3 +34,11 @@ where the status is default, in grace period or late.
 - `total_pymnt` Total payment on the loan
 - `total_rec_prncp` Total received principal on the loan
 - `total_rec_int` Total received interest on the loan
+
+## My plot
+### Heatmap
+<img src="imgs/Figure_1.png" width=80%>
+### Scatter plot
+<img src="imgs/Scatter.png" width=80%>
+### Violin plot
+<img src="imgs/图片1.png" width=80%>
